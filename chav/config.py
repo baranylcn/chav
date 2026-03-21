@@ -51,3 +51,23 @@ class ChavConfig:
         "warn_ratio_threshold": 5.0,
         "minority_share_threshold": 0.05,
     })
+    structural_missingness: dict = field(default_factory=lambda: {
+        "phi_fail_threshold": 0.8,
+        "phi_warn_threshold": 0.5,
+        "min_null_ratio": 0.01,
+    })
+    hidden_redundancy: dict = field(default_factory=lambda: {
+        "correlation_fail_threshold": 0.95,
+        "correlation_warn_threshold": 0.85,
+        "cramers_v_fail_threshold": 0.9,
+        "cramers_v_warn_threshold": 0.75,
+        "eta_fail_threshold": 0.95,
+        "eta_warn_threshold": 0.85,
+    })
+    conditional_drift: dict = field(default_factory=lambda: {
+        "max_stratify_cardinality": 10,
+        "min_subgroup_size": 20,
+        "psi_fail_threshold": 0.25,
+        "psi_warn_threshold": 0.1,
+        "disproportion_factor": 3.0,
+    })
