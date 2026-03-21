@@ -22,14 +22,14 @@ report = analyze("data.csv", target="label")
 print(report.summary())
 ```
 
-Output:
-
 ```
-Chav Report | 506 rows x 14 cols | 1 fail, 1 warn, 4 pass, 7 skipped
---------------------------------------------------------------------------
-  [FAIL] label_leakage            severity=high    confidence=0.90  columns=[LSTAT, RM, INDUS]
-  [WARN] hidden_redundancy        severity=medium  confidence=0.91  columns=[RAD, TAX]
-  ... 4 passed, 7 skipped
+>>> print(report.summary())
+
+Chav Report | 506 rows x 14 cols
+1 fail, 1 warn, 4 pass, 7 skipped
+
+  FAIL  label_leakage         high    0.90   [LSTAT, RM, INDUS]
+  WARN  hidden_redundancy     medium  0.91   [RAD, TAX]
 ```
 
 ## How It Works
@@ -47,11 +47,11 @@ report = analyze(
 
 ### Two Modes
 
-**Single-dataset mode** — diagnostics computed from one dataset alone:
+**Single-dataset mode** - diagnostics computed from one dataset alone:
 
 - Label leakage, duplicate ingestion, constant features, id-like features, temporal inconsistency, imbalance, structural missingness, hidden redundancy
 
-**Compare mode** — requires a reference dataset:
+**Compare mode** - requires a reference dataset:
 
 - Category explosion, drift risk, feature instability, missing explosion, conditional drift
 
@@ -112,11 +112,11 @@ Each diagnostic contains:
 
 **Status meanings:**
 
-- `pass` — no issue detected
-- `warn` — issue exists but is moderate or uncertain
-- `fail` — issue requires attention
-- `skipped` — missing required input (e.g., no target column provided)
-- `error` — rule encountered an internal error
+- `pass` - no issue detected
+- `warn` - issue exists but is moderate or uncertain
+- `fail` - issue requires attention
+- `skipped` - missing required input (e.g., no target column provided)
+- `error` - rule encountered an internal error
 
 **Severity** reflects likely impact, not just metric size. Label leakage suspicion is always `high`. A mild drift in a single column may be `medium` or `low`.
 
@@ -157,12 +157,12 @@ pytest
 
 ### Adding a New Rule
 
-1. Create `chav/rules/your_rule.py` — subclass `BaseRule`, implement `evaluate()`
+1. Create `chav/rules/your_rule.py` - subclass `BaseRule`, implement `evaluate()`
 2. Add default thresholds to `ChavConfig` in `config.py`
-3. Register the class in `rules/__init__.py` → `ALL_RULES`
+3. Register the class in `rules/__init__.py` -> `ALL_RULES`
 4. Add tests in `tests/test_rules.py`
 
-Every rule must return a `Diagnostic` with status, severity, confidence, affected columns, and evidence. If a rule fails internally, it should not crash the analysis — `safe_evaluate()` handles this automatically.
+Every rule must return a `Diagnostic` with status, severity, confidence, affected columns, and evidence. If a rule fails internally, it should not crash the analysis - `safe_evaluate()` handles this automatically.
 
 ## Contributing
 
