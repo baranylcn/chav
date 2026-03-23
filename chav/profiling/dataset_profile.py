@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import pandas as pd
 
+from chav.profiling.column_profile import ColumnProfile
 from chav.typing import ColumnType
 from chav.utils.type_inference import infer_types
-from chav.profiling.column_profile import ColumnProfile
 
 
 class DatasetProfile:

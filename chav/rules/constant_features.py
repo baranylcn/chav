@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-from chav.rules.base import BaseRule
-from chav.typing import Diagnostic, Status, Severity
 from chav.config import ChavConfig
-from chav.profiling.dataset_profile import DatasetProfile
 from chav.profiling.compare_profile import CompareProfile
+from chav.profiling.dataset_profile import DatasetProfile
+from chav.rules.base import BaseRule
+from chav.typing import Diagnostic, Severity, Status
 
 
 class ConstantFeaturesRule(BaseRule):

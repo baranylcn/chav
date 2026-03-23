@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-from chav.rules.base import BaseRule
-from chav.typing import Diagnostic, Status, Severity, ColumnType
 from chav.config import ChavConfig
-from chav.profiling.dataset_profile import DatasetProfile
 from chav.profiling.compare_profile import CompareProfile
+from chav.profiling.dataset_profile import DatasetProfile
+from chav.rules.base import BaseRule
+from chav.typing import ColumnType, Diagnostic, Severity, Status
 
 
 class FeatureInstabilityRule(BaseRule):
@@ -19,6 +19,7 @@ class FeatureInstabilityRule(BaseRule):
         target: str | None = None,
         time_column: str | None = None,
     ) -> Diagnostic:
+        assert compare is not None
         cfg = config.feature_instability
         fail_threshold = cfg["instability_fail_threshold"]
         warn_threshold = cfg["instability_warn_threshold"]
@@ -56,7 +57,7 @@ class FeatureInstabilityRule(BaseRule):
 
             if cc.dtype == ColumnType.NUMERIC and cc.variance_change_ratio is not None:
                 var_ratio = cc.variance_change_ratio
-                if var_ratio != float('inf'):
+                if var_ratio != float("inf"):
                     var_contrib = min(abs(var_ratio - 1.0), 1.0)
                     if abs(var_ratio - 1.0) > 0.2:
                         factors.append(f"variance_ratio={var_ratio:.2f}")

@@ -4,11 +4,11 @@ from itertools import combinations
 
 import numpy as np
 
-from chav.rules.base import BaseRule
-from chav.typing import Diagnostic, Status, Severity
 from chav.config import ChavConfig
-from chav.profiling.dataset_profile import DatasetProfile
 from chav.profiling.compare_profile import CompareProfile
+from chav.profiling.dataset_profile import DatasetProfile
+from chav.rules.base import BaseRule
+from chav.typing import Diagnostic, Severity, Status
 from chav.utils.stats import phi_coefficient
 
 
@@ -28,10 +28,7 @@ class StructuralMissingnessRule(BaseRule):
         phi_warn = cfg["phi_warn_threshold"]
         min_null_ratio = cfg["min_null_ratio"]
 
-        cols_with_nulls = [
-            col for col, cp in profile.columns.items()
-            if cp.missing_ratio >= min_null_ratio
-        ]
+        cols_with_nulls = [col for col, cp in profile.columns.items() if cp.missing_ratio >= min_null_ratio]
 
         if len(cols_with_nulls) < 2:
             return Diagnostic(
@@ -42,7 +39,7 @@ class StructuralMissingnessRule(BaseRule):
             )
 
         df = profile.df
-        null_mask = {col: df[col].isna().values for col in cols_with_nulls}
+        null_mask = {col: df[col].isna().to_numpy() for col in cols_with_nulls}
 
         pairs: list[dict] = []
         affected = set()
@@ -52,13 +49,15 @@ class StructuralMissingnessRule(BaseRule):
 
             if phi >= phi_warn:
                 co_null_count = int(np.sum(null_mask[col_a] & null_mask[col_b]))
-                pairs.append({
-                    "columns": [col_a, col_b],
-                    "phi": round(phi, 4),
-                    "co_null_count": co_null_count,
-                    "co_null_ratio": round(co_null_count / profile.row_count, 4),
-                    "severity": "high" if phi >= phi_fail else "medium",
-                })
+                pairs.append(
+                    {
+                        "columns": [col_a, col_b],
+                        "phi": round(phi, 4),
+                        "co_null_count": co_null_count,
+                        "co_null_ratio": round(co_null_count / profile.row_count, 4),
+                        "severity": "high" if phi >= phi_fail else "medium",
+                    }
+                )
                 affected.add(col_a)
                 affected.add(col_b)
 

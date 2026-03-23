@@ -2,15 +2,13 @@ from __future__ import annotations
 
 import re
 
-import numpy as np
-import pandas as pd
 from sklearn.feature_selection import mutual_info_classif, mutual_info_regression
 
-from chav.rules.base import BaseRule
-from chav.typing import Diagnostic, Status, Severity, ColumnType
 from chav.config import ChavConfig
-from chav.profiling.dataset_profile import DatasetProfile
 from chav.profiling.compare_profile import CompareProfile
+from chav.profiling.dataset_profile import DatasetProfile
+from chav.rules.base import BaseRule
+from chav.typing import ColumnType, Diagnostic, Severity, Status
 
 _SUSPICIOUS_NAMES = re.compile(
     r"(status|result|approved|decision|final|outcome|label|flag|verdict|response)",
@@ -48,6 +46,7 @@ class LabelLeakageRule(BaseRule):
         if len(y_clean) < 10:
             return self._skip()
 
+        assert target is not None
         target_type = profile.column_types.get(target, ColumnType.UNKNOWN)
         is_classification = target_type in (ColumnType.CATEGORICAL, ColumnType.BOOLEAN)
         if not is_classification and target_type == ColumnType.NUMERIC:
@@ -71,10 +70,11 @@ class LabelLeakageRule(BaseRule):
                 else:
                     x = series.fillna("__MISSING__").astype("category").cat.codes.values.reshape(-1, 1)
 
+                discrete = col_type != ColumnType.NUMERIC
                 if is_classification:
-                    mi = mutual_info_classif(x, y_clean, discrete_features=(col_type != ColumnType.NUMERIC), random_state=42)
+                    mi = mutual_info_classif(x, y_clean, discrete_features=discrete, random_state=42)
                 else:
-                    mi = mutual_info_regression(x, y_clean, discrete_features=(col_type != ColumnType.NUMERIC), random_state=42)
+                    mi = mutual_info_regression(x, y_clean, discrete_features=discrete, random_state=42)
 
                 scores[col] = float(mi[0])
             except Exception:
@@ -84,10 +84,7 @@ class LabelLeakageRule(BaseRule):
             return self._skip()
 
         max_score = max(scores.values())
-        if max_score > 0:
-            norm_scores = {k: v / max_score for k, v in scores.items()}
-        else:
-            norm_scores = scores
+        norm_scores = {k: v / max_score for k, v in scores.items()} if max_score > 0 else scores
 
         suspicious = {}
         for col, norm in sorted(norm_scores.items(), key=lambda x: -x[1]):

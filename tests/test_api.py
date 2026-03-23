@@ -21,12 +21,14 @@ def _make_csv(df: pd.DataFrame) -> io.BytesIO:
 def sample_csv():
     np.random.seed(42)
     n = 100
-    df = pd.DataFrame({
-        "age": np.random.randint(18, 65, n),
-        "income": np.random.normal(50000, 15000, n).round(2),
-        "city": np.random.choice(["Istanbul", "Ankara", "Izmir"], n),
-        "label": np.random.choice([0, 1], n, p=[0.6, 0.4]),
-    })
+    df = pd.DataFrame(
+        {
+            "age": np.random.randint(18, 65, n),
+            "income": np.random.normal(50000, 15000, n).round(2),
+            "city": np.random.choice(["Istanbul", "Ankara", "Izmir"], n),
+            "label": np.random.choice([0, 1], n, p=[0.6, 0.4]),
+        }
+    )
     return _make_csv(df)
 
 
@@ -34,12 +36,14 @@ def sample_csv():
 def reference_csv():
     np.random.seed(10)
     n = 100
-    df = pd.DataFrame({
-        "age": np.random.randint(18, 65, n),
-        "income": np.random.normal(50000, 15000, n).round(2),
-        "city": np.random.choice(["Istanbul", "Ankara", "Izmir"], n),
-        "label": np.random.choice([0, 1], n, p=[0.6, 0.4]),
-    })
+    df = pd.DataFrame(
+        {
+            "age": np.random.randint(18, 65, n),
+            "income": np.random.normal(50000, 15000, n).round(2),
+            "city": np.random.choice(["Istanbul", "Ankara", "Izmir"], n),
+            "label": np.random.choice([0, 1], n, p=[0.6, 0.4]),
+        }
+    )
     return _make_csv(df)
 
 
@@ -60,7 +64,7 @@ class TestAnalyzeEndpoint:
         body = resp.json()
         assert "diagnostics" in body
         assert "dataset_summary" in body
-        assert len(body["diagnostics"]) == 10
+        assert len(body["diagnostics"]) == 13
 
     def test_with_target(self, sample_csv):
         resp = client.post(

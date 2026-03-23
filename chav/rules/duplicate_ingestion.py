@@ -2,11 +2,11 @@ from __future__ import annotations
 
 import pandas as pd
 
-from chav.rules.base import BaseRule
-from chav.typing import Diagnostic, Status, Severity
 from chav.config import ChavConfig
-from chav.profiling.dataset_profile import DatasetProfile
 from chav.profiling.compare_profile import CompareProfile
+from chav.profiling.dataset_profile import DatasetProfile
+from chav.rules.base import BaseRule
+from chav.typing import Diagnostic, Severity, Status
 
 
 class DuplicateIngestionRule(BaseRule):
@@ -28,10 +28,7 @@ class DuplicateIngestionRule(BaseRule):
         dup_ratio = profile.duplicate_row_ratio
         dup_count = int(df.duplicated().sum())
 
-        non_id_cols = [
-            c for c, p in profile.columns.items()
-            if p.uniqueness_ratio < 0.95
-        ]
+        non_id_cols = [c for c, p in profile.columns.items() if p.uniqueness_ratio < 0.95]
         dup_ratio_no_id = 0.0
         if non_id_cols:
             dup_ratio_no_id = float(df[non_id_cols].duplicated().mean())

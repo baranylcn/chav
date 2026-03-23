@@ -2,10 +2,10 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 
-from chav.typing import Diagnostic, Status, Severity
 from chav.config import ChavConfig
-from chav.profiling.dataset_profile import DatasetProfile
 from chav.profiling.compare_profile import CompareProfile
+from chav.profiling.dataset_profile import DatasetProfile
+from chav.typing import Diagnostic, Severity, Status
 
 
 class BaseRule(ABC):
@@ -22,8 +22,7 @@ class BaseRule(ABC):
         compare: CompareProfile | None = None,
         target: str | None = None,
         time_column: str | None = None,
-    ) -> Diagnostic:
-        ...
+    ) -> Diagnostic: ...
 
     def _skip(self) -> Diagnostic:
         return Diagnostic(

@@ -27,7 +27,7 @@ def compute_psi(reference: pd.Series, current: pd.Series, bins: int | None = Non
     ref_pct = (ref_counts + 1) / (ref_counts.sum() + len(ref_counts))
     cur_pct = (cur_counts + 1) / (cur_counts.sum() + len(cur_counts))
 
-    psi = np.sum((cur_pct - ref_pct) * np.log(cur_pct / ref_pct))
+    psi: float = np.sum((cur_pct - ref_pct) * np.log(cur_pct / ref_pct))
     return float(psi)
 
 
@@ -110,7 +110,7 @@ def correlation_ratio(categories: pd.Series, values: pd.Series) -> float:
     for _, group_vals in groups:
         ss_between += len(group_vals) * (group_vals.mean() - grand_mean) ** 2
 
-    ss_total = np.sum((vals - grand_mean) ** 2)
+    ss_total: float = np.sum((vals - grand_mean) ** 2)
     if ss_total == 0:
         return 0.0
 

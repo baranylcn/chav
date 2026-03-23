@@ -1,11 +1,14 @@
 from __future__ import annotations
 
-from chav.typing import Diagnostic, Status, Severity
+from chav.typing import Diagnostic, Status
 
 
 def format_diagnostic(d: Diagnostic) -> str:
     cols = ", ".join(d.affected_columns) if d.affected_columns else "-"
-    return f"  [{d.status.value.upper():4s}] {d.rule:<25s}  severity={d.severity.value:<6s}  confidence={d.confidence:.2f}  columns=[{cols}]"
+    return (
+        f"  [{d.status.value.upper():4s}] {d.rule:<25s}  "
+        f"severity={d.severity.value:<6s}  confidence={d.confidence:.2f}  columns=[{cols}]"
+    )
 
 
 def format_summary(diagnostics: list[Diagnostic], rows: int, columns: int) -> str:

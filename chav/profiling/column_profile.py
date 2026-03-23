@@ -3,7 +3,6 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
-import numpy as np
 import pandas as pd
 
 from chav.typing import ColumnType
@@ -41,11 +40,11 @@ class ColumnProfile:
             vc = non_null.value_counts()
             dominant_val = vc.index[0]
             dominant_share = float(vc.iloc[0] / len(non_null))
-            if hasattr(dominant_val, 'item'):
+            if hasattr(dominant_val, "item"):
                 dominant_val = dominant_val.item()
 
         prof = cls(
-            name=series.name,
+            name=str(series.name),
             dtype=dtype,
             row_count=n,
             missing_count=missing,

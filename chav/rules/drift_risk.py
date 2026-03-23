@@ -2,11 +2,11 @@ from __future__ import annotations
 
 from scipy import stats as sp_stats
 
-from chav.rules.base import BaseRule
-from chav.typing import Diagnostic, Status, Severity, ColumnType
 from chav.config import ChavConfig
-from chav.profiling.dataset_profile import DatasetProfile
 from chav.profiling.compare_profile import CompareProfile
+from chav.profiling.dataset_profile import DatasetProfile
+from chav.rules.base import BaseRule
+from chav.typing import ColumnType, Diagnostic, Severity, Status
 
 
 class DriftRiskRule(BaseRule):
@@ -21,6 +21,7 @@ class DriftRiskRule(BaseRule):
         target: str | None = None,
         time_column: str | None = None,
     ) -> Diagnostic:
+        assert compare is not None
         cfg = config.drift_risk
         psi_fail = cfg["psi_fail_threshold"]
         psi_warn = cfg["psi_warn_threshold"]

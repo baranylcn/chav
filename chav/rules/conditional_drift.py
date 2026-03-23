@@ -1,13 +1,10 @@
 from __future__ import annotations
 
-import numpy as np
-import pandas as pd
-
-from chav.rules.base import BaseRule
-from chav.typing import Diagnostic, Status, Severity, ColumnType
 from chav.config import ChavConfig
-from chav.profiling.dataset_profile import DatasetProfile
 from chav.profiling.compare_profile import CompareProfile
+from chav.profiling.dataset_profile import DatasetProfile
+from chav.rules.base import BaseRule
+from chav.typing import ColumnType, Diagnostic, Severity, Status
 from chav.utils.stats import compute_psi
 
 
@@ -23,6 +20,7 @@ class ConditionalDriftRule(BaseRule):
         target: str | None = None,
         time_column: str | None = None,
     ) -> Diagnostic:
+        assert compare is not None
         cfg = config.conditional_drift
         max_card = cfg["max_stratify_cardinality"]
         min_subgroup = cfg["min_subgroup_size"]
@@ -35,15 +33,13 @@ class ConditionalDriftRule(BaseRule):
         ref_types = compare.reference.column_types
 
         stratify_cols = [
-            col for col in compare.common_columns
+            col
+            for col in compare.common_columns
             if ref_types.get(col) == ColumnType.CATEGORICAL
             and 2 <= (compare.reference.columns[col].cardinality or 0) <= max_card
         ]
 
-        numeric_cols = [
-            col for col in compare.common_columns
-            if ref_types.get(col) == ColumnType.NUMERIC
-        ]
+        numeric_cols = [col for col in compare.common_columns if ref_types.get(col) == ColumnType.NUMERIC]
 
         if not stratify_cols or not numeric_cols:
             return Diagnostic(
@@ -76,27 +72,34 @@ class ConditionalDriftRule(BaseRule):
                         continue
 
                     sub_psi = compute_psi(ref_sub, cur_sub)
-                    subgroup_results.append({
-                        "group_value": str(group_val),
-                        "subgroup_psi": round(sub_psi, 4),
-                        "ref_size": len(ref_sub),
-                        "cur_size": len(cur_sub),
-                    })
+                    subgroup_results.append(
+                        {
+                            "group_value": str(group_val),
+                            "subgroup_psi": round(sub_psi, 4),
+                            "ref_size": len(ref_sub),
+                            "cur_size": len(cur_sub),
+                        }
+                    )
 
                 flagged = _flag_subgroups(
-                    subgroup_results, overall_psi,
-                    psi_warn, psi_fail, disproportion,
+                    subgroup_results,
+                    overall_psi,
+                    psi_warn,
+                    psi_fail,
+                    disproportion,
                 )
 
                 if flagged:
                     max_sub_psi = max(s["subgroup_psi"] for s in flagged)
-                    findings.append({
-                        "stratify_column": strat_col,
-                        "numeric_column": num_col,
-                        "overall_psi": round(overall_psi, 4),
-                        "subgroups": sorted(flagged, key=lambda s: s["subgroup_psi"], reverse=True),
-                        "severity": "high" if max_sub_psi >= psi_fail else "medium",
-                    })
+                    findings.append(
+                        {
+                            "stratify_column": strat_col,
+                            "numeric_column": num_col,
+                            "overall_psi": round(overall_psi, 4),
+                            "subgroups": sorted(flagged, key=lambda s: s["subgroup_psi"], reverse=True),
+                            "severity": "high" if max_sub_psi >= psi_fail else "medium",
+                        }
+                    )
                     affected.update([strat_col, num_col])
 
         if not findings:
@@ -108,11 +111,7 @@ class ConditionalDriftRule(BaseRule):
             )
 
         has_high = any(f["severity"] == "high" for f in findings)
-        max_psi = max(
-            s["subgroup_psi"]
-            for f in findings
-            for s in f["subgroups"]
-        )
+        max_psi = max(s["subgroup_psi"] for f in findings for s in f["subgroups"])
         confidence = round(min(max_psi / psi_fail, 1.0), 4)
 
         return Diagnostic(

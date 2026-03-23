@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import pandas as pd
-import numpy as np
 
 from chav.typing import ColumnType
 
@@ -20,7 +19,7 @@ def infer_column_type(series: pd.Series) -> ColumnType:
 
     if pd.api.types.is_numeric_dtype(dtype):
         nunique = series.dropna().nunique()
-        if nunique <= 2 and set(series.dropna().unique()).issubset({0, 1, 0.0, 1.0, True, False}):
+        if nunique <= 2 and set(series.dropna().unique()).issubset({0, 1}):
             return ColumnType.BOOLEAN
         return ColumnType.NUMERIC
 
@@ -28,8 +27,9 @@ def infer_column_type(series: pd.Series) -> ColumnType:
         sample = series.dropna()
         if len(sample) > 0:
             try:
-                pd.to_datetime(sample.head(50), infer_datetime_format=True)
-                if len(sample) <= 50 or pd.to_datetime(sample.sample(min(50, len(sample))), errors="coerce").notna().mean() > 0.8:
+                pd.to_datetime(sample.head(50))
+                sampled = pd.to_datetime(sample.sample(min(50, len(sample))), errors="coerce")
+                if len(sample) <= 50 or sampled.notna().mean() > 0.8:
                     return ColumnType.DATETIME
             except (ValueError, TypeError):
                 pass

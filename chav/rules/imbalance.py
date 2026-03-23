@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-from chav.rules.base import BaseRule
-from chav.typing import Diagnostic, Status, Severity, ColumnType
 from chav.config import ChavConfig
-from chav.profiling.dataset_profile import DatasetProfile
 from chav.profiling.compare_profile import CompareProfile
+from chav.profiling.dataset_profile import DatasetProfile
+from chav.rules.base import BaseRule
+from chav.typing import ColumnType, Diagnostic, Severity, Status
 
 MAX_CLASSES = 50
 
@@ -21,6 +21,7 @@ class ImbalanceRule(BaseRule):
         target: str | None = None,
         time_column: str | None = None,
     ) -> Diagnostic:
+        assert target is not None
         if target not in profile.df.columns:
             return self._skip()
 
@@ -41,7 +42,7 @@ class ImbalanceRule(BaseRule):
 
         majority_count = int(vc.iloc[0])
         minority_count = int(vc.iloc[-1])
-        imbalance_ratio = majority_count / minority_count if minority_count > 0 else float('inf')
+        imbalance_ratio = majority_count / minority_count if minority_count > 0 else float("inf")
         minority_share = minority_count / len(series) if len(series) > 0 else 0.0
 
         evidence = {

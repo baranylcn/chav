@@ -4,11 +4,11 @@ from datetime import timedelta
 
 import pandas as pd
 
-from chav.rules.base import BaseRule
-from chav.typing import Diagnostic, Status, Severity
 from chav.config import ChavConfig
-from chav.profiling.dataset_profile import DatasetProfile
 from chav.profiling.compare_profile import CompareProfile
+from chav.profiling.dataset_profile import DatasetProfile
+from chav.rules.base import BaseRule
+from chav.typing import Diagnostic, Severity, Status
 
 
 class TemporalInconsistencyRule(BaseRule):
@@ -23,6 +23,7 @@ class TemporalInconsistencyRule(BaseRule):
         target: str | None = None,
         time_column: str | None = None,
     ) -> Diagnostic:
+        assert time_column is not None
         if time_column not in profile.df.columns:
             return self._skip()
 

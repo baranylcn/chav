@@ -2,11 +2,11 @@ from __future__ import annotations
 
 import re
 
-from chav.rules.base import BaseRule
-from chav.typing import Diagnostic, Status, Severity, ColumnType
 from chav.config import ChavConfig
-from chav.profiling.dataset_profile import DatasetProfile
 from chav.profiling.compare_profile import CompareProfile
+from chav.profiling.dataset_profile import DatasetProfile
+from chav.rules.base import BaseRule
+from chav.typing import ColumnType, Diagnostic, Severity, Status
 
 _ID_PATTERNS = re.compile(r"(^id$|_id$|^id_|uuid|hash|token|_key$|^key_)", re.IGNORECASE)
 

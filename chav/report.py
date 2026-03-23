@@ -37,10 +37,7 @@ class Report:
         return format_summary(self.diagnostics, self.rows, self.columns)
 
     def to_dict(self, all: bool = False) -> dict[str, Any]:
-        if all:
-            diags = self.diagnostics
-        else:
-            diags = [d for d in self.diagnostics if d.status in _ACTIONABLE]
+        diags = self.diagnostics if all else [d for d in self.diagnostics if d.status in _ACTIONABLE]
 
         return {
             "dataset_summary": {

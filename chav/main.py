@@ -3,7 +3,7 @@ from __future__ import annotations
 import io
 
 import pandas as pd
-from fastapi import FastAPI, UploadFile, File, Form, HTTPException
+from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.responses import JSONResponse
 
 from chav.engine import analyze
@@ -13,17 +13,23 @@ app = FastAPI(title="Chav", version="0.1.0")
 
 
 @app.get("/health")
-def health():
+def health() -> dict[str, str]:
     return {"status": "ok"}
+
+
+_DATA_FILE = File(...)
+_REF_FILE = File(None)
+_TARGET_FORM = Form(None)
+_TIME_FORM = Form(None)
 
 
 @app.post("/analyze", response_model=ReportOut)
 async def analyze_endpoint(
-    data: UploadFile = File(...),
-    reference_data: UploadFile | None = File(None),
-    target: str | None = Form(None),
-    time_column: str | None = Form(None),
-):
+    data: UploadFile = _DATA_FILE,
+    reference_data: UploadFile | None = _REF_FILE,
+    target: str | None = _TARGET_FORM,
+    time_column: str | None = _TIME_FORM,
+) -> JSONResponse:
     df = _read_upload(data)
 
     ref_df = None
@@ -48,12 +54,12 @@ def _read_upload(upload: UploadFile) -> pd.DataFrame:
         try:
             return pd.read_csv(io.BytesIO(content))
         except Exception as e:
-            raise HTTPException(status_code=400, detail=f"CSV parse error: {e}")
+            raise HTTPException(status_code=400, detail=f"CSV parse error: {e}") from None
 
     if filename.endswith(".parquet"):
         try:
             return pd.read_parquet(io.BytesIO(content))
         except Exception as e:
-            raise HTTPException(status_code=400, detail=f"Parquet parse error: {e}")
+            raise HTTPException(status_code=400, detail=f"Parquet parse error: {e}") from None
 
     raise HTTPException(status_code=400, detail=f"Unsupported format: {filename}")

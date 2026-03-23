@@ -1,15 +1,14 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
 
 import pandas as pd
 
 from chav.config import ChavConfig
-from chav.profiling.dataset_profile import DatasetProfile
 from chav.profiling.compare_profile import CompareProfile
-from chav.rules import ALL_RULES
+from chav.profiling.dataset_profile import DatasetProfile
 from chav.report import Report
+from chav.rules import ALL_RULES
 from chav.typing import ColumnType
 
 

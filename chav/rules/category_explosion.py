@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-from chav.rules.base import BaseRule
-from chav.typing import Diagnostic, Status, Severity, ColumnType
 from chav.config import ChavConfig
-from chav.profiling.dataset_profile import DatasetProfile
 from chav.profiling.compare_profile import CompareProfile
+from chav.profiling.dataset_profile import DatasetProfile
+from chav.rules.base import BaseRule
+from chav.typing import ColumnType, Diagnostic, Severity, Status
 
 
 class CategoryExplosionRule(BaseRule):
@@ -19,6 +19,7 @@ class CategoryExplosionRule(BaseRule):
         target: str | None = None,
         time_column: str | None = None,
     ) -> Diagnostic:
+        assert compare is not None
         cfg = config.category_explosion
         growth_fail = cfg["cardinality_growth_threshold"]
         unseen_fail = cfg["unseen_ratio_threshold"]

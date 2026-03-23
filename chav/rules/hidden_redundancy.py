@@ -5,12 +5,12 @@ from itertools import combinations
 import numpy as np
 import pandas as pd
 
-from chav.rules.base import BaseRule
-from chav.typing import Diagnostic, Status, Severity, ColumnType
 from chav.config import ChavConfig
-from chav.profiling.dataset_profile import DatasetProfile
 from chav.profiling.compare_profile import CompareProfile
-from chav.utils.stats import cramers_v, correlation_ratio
+from chav.profiling.dataset_profile import DatasetProfile
+from chav.rules.base import BaseRule
+from chav.typing import ColumnType, Diagnostic, Severity, Status
+from chav.utils.stats import correlation_ratio, cramers_v
 
 
 class HiddenRedundancyRule(BaseRule):
@@ -53,12 +53,14 @@ class HiddenRedundancyRule(BaseRule):
 
             if abs_r >= corr_warn:
                 sev = "high" if abs_r >= corr_fail else "medium"
-                redundant_pairs.append({
-                    "columns": [col_a, col_b],
-                    "method": "pearson",
-                    "score": round(abs_r, 4),
-                    "severity": sev,
-                })
+                redundant_pairs.append(
+                    {
+                        "columns": [col_a, col_b],
+                        "method": "pearson",
+                        "score": round(abs_r, 4),
+                        "severity": sev,
+                    }
+                )
                 affected.update([col_a, col_b])
 
         for col_a, col_b in combinations(categorical_cols, 2):
@@ -71,12 +73,14 @@ class HiddenRedundancyRule(BaseRule):
 
             if cv >= cv_warn:
                 sev = "high" if cv >= cv_fail else "medium"
-                redundant_pairs.append({
-                    "columns": [col_a, col_b],
-                    "method": "cramers_v",
-                    "score": round(cv, 4),
-                    "severity": sev,
-                })
+                redundant_pairs.append(
+                    {
+                        "columns": [col_a, col_b],
+                        "method": "cramers_v",
+                        "score": round(cv, 4),
+                        "severity": sev,
+                    }
+                )
                 affected.update([col_a, col_b])
 
         for cat_col in categorical_cols:
@@ -87,12 +91,14 @@ class HiddenRedundancyRule(BaseRule):
 
                 if eta >= eta_warn:
                     sev = "high" if eta >= eta_fail else "medium"
-                    redundant_pairs.append({
-                        "columns": [cat_col, num_col],
-                        "method": "correlation_ratio",
-                        "score": round(eta, 4),
-                        "severity": sev,
-                    })
+                    redundant_pairs.append(
+                        {
+                            "columns": [cat_col, num_col],
+                            "method": "correlation_ratio",
+                            "score": round(eta, 4),
+                            "severity": sev,
+                        }
+                    )
                     affected.update([cat_col, num_col])
 
         if not redundant_pairs:
