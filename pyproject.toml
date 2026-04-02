@@ -32,6 +32,9 @@ dependencies = [
     "scikit-learn>=1.1",
 ]
 
+[project.scripts]
+chav = "chav.cli:cli_entry"
+
 [project.urls]
 Homepage = "https://github.com/baranylcn/chav"
 Repository = "https://github.com/baranylcn/chav"
