@@ -355,3 +355,39 @@ class TestReportStructure:
         report = analyze(clean_df)
         s = report.summary()
         assert "Chav Report" in s
+
+    def test_to_dataframe(self, clean_df):
+        report = analyze(clean_df)
+        df = report.to_dataframe(all=True)
+        assert list(df.columns) == ["rule", "status", "severity", "confidence", "affected_columns", "evidence"]
+        assert len(df) == len(report.diagnostics)
+
+    def test_to_dataframe_filters_actionable(self, dirty_df):
+        report = analyze(dirty_df)
+        df_all = report.to_dataframe(all=True)
+        df_actionable = report.to_dataframe(all=False)
+        assert len(df_actionable) <= len(df_all)
+        assert set(df_actionable["status"]).issubset({"warn", "fail", "error"})
+
+    def test_to_csv_returns_string(self, clean_df):
+        import io
+        report = analyze(clean_df)
+        csv_str = report.to_csv(all=True)
+        assert csv_str is not None
+        df = pd.read_csv(io.StringIO(csv_str))
+        assert "rule" in df.columns
+
+    def test_to_csv_writes_file(self, clean_df, tmp_path):
+        report = analyze(clean_df)
+        path = str(tmp_path / "report.csv")
+        result = report.to_csv(path=path, all=True)
+        assert result is None
+        df = pd.read_csv(path)
+        assert "rule" in df.columns
+
+    def test_to_excel_writes_file(self, clean_df, tmp_path):
+        report = analyze(clean_df)
+        path = str(tmp_path / "report.xlsx")
+        report.to_excel(path, all=True)
+        df = pd.read_excel(path)
+        assert "rule" in df.columns

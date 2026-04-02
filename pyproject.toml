@@ -50,6 +50,7 @@ dev = [
     "mypy>=1.8",
     "pre-commit>=3.0",
     "pandas-stubs>=1.5",
+    "openpyxl>=3.0",
 ]
 
 [tool.setuptools.packages.find]
