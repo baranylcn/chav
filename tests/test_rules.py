@@ -371,6 +371,7 @@ class TestReportStructure:
 
     def test_to_csv_returns_string(self, clean_df):
         import io
+
         report = analyze(clean_df)
         csv_str = report.to_csv(all=True)
         assert csv_str is not None
