@@ -41,14 +41,14 @@ Repository = "https://github.com/baranylcn/chav"
 Issues = "https://github.com/baranylcn/chav/issues"
 
 [project.optional-dependencies]
-server = ["fastapi>=0.100", "uvicorn>=0.22", "python-multipart>=0.0.6"]
+server = ["fastapi>=0.100", "uvicorn>=0.22", "python-multipart>=0.0.26"]
 dev = [
     "pytest>=7.0",
     "pytest-cov>=4.0",
     "httpx>=0.24",
     "fastapi>=0.100",
     "uvicorn>=0.22",
-    "python-multipart>=0.0.6",
+    "python-multipart>=0.0.26",
     "ruff>=0.4",
     "mypy>=1.8",
     "pre-commit>=3.0",
